@@ -25,16 +25,18 @@
         .card-title { color: #b388ff; font-weight: bold; margin-top: 10px; display: block; }
         .btn { background-color: #673ab7; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
 
-        #screen-feed { padding: 0; overflow-y: scroll; scroll-snap-type: y mandatory; height: calc(100% + 20px); margin-top: -20px; }
-        .feed-item { height: 695px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; position: relative; box-shadow: inset 0 0 100px rgba(0,0,0,0.8); }
+        /* Feed System */
+        .feed-stream { overflow-y: scroll; scroll-snap-type: y mandatory; height: 100%; scroll-behavior: smooth; }
+        .feed-item { height: 710px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 35px; text-align: center; position: relative; box-shadow: inset 0 0 100px rgba(0,0,0,0.8); }
         
-        .bg-gradient-1 { background: linear-gradient(135deg, #311b92, #1a237e); }
-        .bg-gradient-2 { background: linear-gradient(135deg, #4a148c, #311b92); }
-        .bg-gradient-3 { background: linear-gradient(135deg, #006064, #004d40); }
+        .bg-gradient-1 { background: linear-gradient(135deg, #2e1c47, #141b41); }
+        .bg-gradient-2 { background: linear-gradient(135deg, #42123c, #261c38); }
+        .bg-gradient-3 { background: linear-gradient(135deg, #0d3b40, #072624); }
+        .bg-gradient-user { background: linear-gradient(135deg, #1f3c3d, #261c38); }
         
-        .feed-verse { font-size: 1.4rem; font-style: italic; line-height: 1.6; margin-bottom: 20px; }
-        .feed-author { color: #b388ff; font-weight: bold; }
-        .quiz-option { background-color: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); color: white; padding: 15px; border-radius: 12px; width: 100%; margin-top: 12px; cursor: pointer; font-size: 1rem; }
+        .feed-verse { font-size: 1.35rem; font-style: italic; line-height: 1.6; margin-bottom: 20px; word-break: break-word; }
+        .feed-author { color: #b388ff; font-weight: bold; font-size: 1rem; }
+        .quiz-option { background-color: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.15); color: white; padding: 14px; border-radius: 12px; width: 100%; margin-top: 12px; cursor: pointer; font-size: 0.95rem; text-align: center; transition: all 0.2s; }
 
         .bible-section-title { font-size: 1.1rem; color: #b388ff; margin: 20px 0 10px 0; font-weight: bold; border-bottom: 1px solid #33254c; padding-bottom: 5px; }
         .list-item { background-color: #222; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -45,7 +47,7 @@
         .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 65px; background-color: #1a1a1a; border-top: 1px solid #2a2a2a; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
         .nav-item { color: #888; cursor: pointer; font-size: 0.85rem; display: flex; flex-direction: column; align-items: center; }
         .nav-item.active { color: #b388ff; font-weight: bold; }
-        .fab { position: absolute; right: 20px; bottom: 85px; width: 56px; height: 56px; background-color: #b388ff; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+        .fab { position: absolute; right: 20px; bottom: 85px; width: 56px; height: 56px; background-color: #b388ff; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-size: 1.5rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 15; }
     </style>
 </head>
 <body>
@@ -63,21 +65,23 @@
                 <button class="btn" onclick="alert('Schön, dass du dir heute Zeit für Gott nimmst!')">Heute darüber nachdenken</button>
             </div>
 
-            <div id="screen-feed" class="screen"></div>
+            <div id="screen-feed" class="screen" style="position: relative; height: 100%;">
+                <div class="feed-stream" id="feed-stream-container">
+                    </div>
+                <div class="fab" style="background-color: #673ab7; color: white; bottom: 20px; right: 20px;" onclick="openFeedModal()">+</div>
+            </div>
 
             <div id="screen-bibel" class="screen">
                 <div style="margin-bottom: 15px; display: flex; gap: 8px;">
                     <input type="text" id="bible-search-input" placeholder="Wort suchen (z.B. Liebe)..." style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #673ab7; background: #222; color: white;">
                     <button class="btn" style="width: auto; margin-top: 0; padding: 10px 15px;" onclick="searchBible()">🔍</button>
                 </div>
-
                 <div id="bible-search-results" style="display: none; margin-bottom: 20px;">
                     <h3 style="color: #b388ff; margin-bottom: 10px;">Suchergebnisse:</h3>
                     <div id="search-results-container"></div>
                     <button class="btn" style="background-color: #333;" onclick="clearSearch()">Suche schließen</button>
                     <hr style="border-color: #33254c; margin-top: 15px; margin-bottom: 15px;">
                 </div>
-
                 <div id="bible-main-views">
                     <div id="bible-books-view"></div>
                     <div id="bible-chapters-view" style="display: none;">
@@ -105,6 +109,22 @@
                 <div class="fab" onclick="addPrayer()">+</div>
             </div>
 
+        </div>
+
+        <div id="feed-upload-modal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,18,18,0.98); z-index: 100; padding: 25px; flex-direction: column; justify-content: center;">
+            <h3 style="color: #b388ff; margin-bottom: 20px; text-align: center; font-size: 1.4rem;">Teile ein Wort Gottes</h3>
+            
+            <label style="font-size: 0.85rem; color: #aaa; margin-bottom: 5px;">Welcher Vers ist es?</label>
+            <input type="text" id="modal-feed-title" placeholder="z.B. Johannes 3,16" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #673ab7; color: white; border-radius: 8px; font-size: 1rem;">
+            
+            <label style="font-size: 0.85rem; color: #aaa; margin-bottom: 5px;">Der Vers-Text:</label>
+            <textarea id="modal-feed-text" placeholder="Schreibe hier den Bibelvers oder Gedanken auf..." rows="5" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #673ab7; color: white; border-radius: 8px; resize: none; font-size: 1rem; font-family: sans-serif;"></textarea>
+            
+            <label style="font-size: 0.85rem; color: #aaa; margin-bottom: 5px;">Dein Name:</label>
+            <input type="text" id="modal-feed-author" placeholder="Anonym oder dein Name" style="width: 100%; padding: 12px; margin-bottom: 25px; background: #222; border: 1px solid #673ab7; color: white; border-radius: 8px; font-size: 1rem;">
+            
+            <button class="btn" onclick="submitNewFeedItem()">In den Feed posten ✨</button>
+            <button class="btn" style="background: #333; margin-top: 10px;" onclick="closeFeedModal()">Abbrechen</button>
         </div>
 
         <div class="bottom-nav">
