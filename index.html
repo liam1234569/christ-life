@@ -146,38 +146,28 @@
     <script src="profil.js"></script>
     
     <script>
-        function switchScreen(screenId, title, navElement) {
-            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-            document.getElementById('screen-' + screenId).classList.add('active');
-            document.getElementById('app-bar-title').innerText = title;
-            
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            navElement.classList.add('active');
+function switchScreen(screenId, title, navElement) {
+    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+    document.getElementById('screen-' + screenId).classList.add('active');
+    document.getElementById('app-bar-title').innerText = title;
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    navElement.classList.add('active');
 
-            let contentArea = document.getElementById('main-content-area');
-            contentArea.style.padding = (screenId === 'feed') ? '0' : '20px';
-            
-            document.getElementById('bible-back-btn').style.display = "none";
-            if(screenId === 'bibel' && typeof resetBibleView === "function") { 
-                resetBibleView(); 
-            }
-        }
+    let contentArea = document.getElementById('main-content-area');
+    contentArea.style.padding = (screenId === 'feed') ? '0' : '20px';
+    
+    document.getElementById('bible-back-btn').style.display = "none";
+    
+    // NEU: Wenn der Profil-Tab angeklickt wird, rufen wir die Render-Funktion auf
+    if (screenId === 'profil' && typeof renderProfil === "function") {
+        renderProfil();
+    }
 
-        function prayCounter(button) {
-            let count = parseInt(button.innerText.replace('🔥 ', ''));
-            button.innerText = '🔥 ' + (count + 1);
-        }
-
-        function addPrayer() {
-            let text = prompt("Dein Gebetsanliegen:");
-            if(text && text.trim() !== "") {
-                let container = document.getElementById('prayer-wall-container');
-                let newCard = document.createElement('div');
-                newCard.className = 'list-item';
-                newCard.innerHTML = `<div><div class="list-item-title">„${text}“</div><div class="list-item-sub">Gerade eben • Du</div></div><button style="background: none; border: none; color: #ff9800; font-size: 1.2rem;" onclick="prayCounter(this)">🔥 0</button>`;
-                container.insertBefore(newCard, container.firstChild);
-            }
-        }
+    if(screenId === 'bibel' && typeof resetBibleView === "function") { 
+        resetBibleView(); 
+    }
+}
     </script>
 </body>
 </html>
