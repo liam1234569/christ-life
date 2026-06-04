@@ -107,6 +107,10 @@
                     </div>
                 </div>
                 <div class="fab" onclick="addPrayer()">+</div>
+                <div id="screen-profil" class="screen">
+                <div id="profil-content">
+                    </div>
+            </div>
             </div>
 
         </div>
@@ -132,12 +136,14 @@
             <div class="nav-item" onclick="switchScreen('feed', 'Entdecken', this)"><span>📱</span><span>Feed</span></div>
             <div class="nav-item" onclick="switchScreen('bibel', 'Die Bibel', this)"><span>📖</span><span>Bibel</span></div>
             <div class="nav-item" onclick="switchScreen('community', 'Community', this)"><span>❤️</span><span>Community</span></div>
+            <div class="nav-item" onclick="switchScreen('profil', 'Mein Profil', this)"><span>👤</span><span>Profil</span></div>
         </div>
     </div>
 
     <script src="impuls.js"></script>
     <script src="feed.js"></script>
     <script src="bibel.js"></script>
+    <script src="profil.js"></script>
     
     <script>
         function switchScreen(screenId, title, navElement) {
