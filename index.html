@@ -44,8 +44,9 @@
         .chapter-box { background-color: #261c38; border: 1px solid #673ab7; color: white; padding: 12px; border-radius: 8px; cursor: pointer; text-align: center; }
         .bible-text { font-size: 1.1rem; line-height: 1.6; white-space: pre-line; text-align: left; }
 
-        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 65px; background-color: #1a1a1a; border-top: 1px solid #2a2a2a; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
-        .nav-item { color: #888; cursor: pointer; font-size: 0.85rem; display: flex; flex-direction: column; align-items: center; }
+        /* Navigation fixiert im Handygehäuse */
+        .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; background-color: #1a1a1a; border-top: 1px solid #2a2a2a; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
+        .nav-item { color: #888; cursor: pointer; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item.active { color: #b388ff; font-weight: bold; }
         .fab { position: absolute; right: 20px; bottom: 85px; width: 56px; height: 56px; background-color: #b388ff; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-size: 1.5rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 15; }
     </style>
@@ -66,8 +67,7 @@
             </div>
 
             <div id="screen-feed" class="screen" style="position: relative; height: 100%;">
-                <div class="feed-stream" id="feed-stream-container">
-                    </div>
+                <div class="feed-stream" id="feed-stream-container"></div>
                 <div class="fab" style="background-color: #673ab7; color: white; bottom: 20px; right: 20px;" onclick="openFeedModal()">+</div>
             </div>
 
@@ -107,85 +107,14 @@
                     </div>
                 </div>
                 <div class="fab" onclick="addPrayer()">+</div>
-                <div id="screen-profil" class="screen">
-    <div id="profil-content">
-        </div>
-</div>
-            </div>
             </div>
 
-        </div>
+            <div id="screen-profil" class="screen">
+                <div id="profil-content">
+                    </div>
+            </div>
 
-        <div id="feed-upload-modal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,18,18,0.98); z-index: 100; padding: 25px; flex-direction: column; justify-content: center;">
+        </div> <div id="feed-upload-modal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,18,18,0.98); z-index: 100; padding: 25px; flex-direction: column; justify-content: center;">
             <h3 style="color: #b388ff; margin-bottom: 20px; text-align: center; font-size: 1.4rem;">Teile ein Wort Gottes</h3>
-            
             <label style="font-size: 0.85rem; color: #aaa; margin-bottom: 5px;">Welcher Vers ist es?</label>
-            <input type="text" id="modal-feed-title" placeholder="z.B. Johannes 3,16" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #673ab7; color: white; border-radius: 8px; font-size: 1rem;">
-            
-            <label style="font-size: 0.85rem; color: #aaa; margin-bottom: 5px;">Der Vers-Text:</label>
-            <textarea id="modal-feed-text" placeholder="Schreibe hier den Bibelvers oder Gedanken auf..." rows="5" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #673ab7; color: white; border-radius: 8px; resize: none; font-size: 1rem; font-family: sans-serif;"></textarea>
-            
-            <label style="font-size: 0.85rem; color: #aaa; margin-bottom: 5px;">Dein Name:</label>
-            <input type="text" id="modal-feed-author" placeholder="Anonym oder dein Name" style="width: 100%; padding: 12px; margin-bottom: 25px; background: #222; border: 1px solid #673ab7; color: white; border-radius: 8px; font-size: 1rem;">
-            
-            <button class="btn" onclick="submitNewFeedItem()">In den Feed posten ✨</button>
-            <button class="btn" style="background: #333; margin-top: 10px;" onclick="closeFeedModal()">Abbrechen</button>
-        </div>
-
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchScreen('impuls', 'Dein Tagesimpuls', this)"><span>⚡</span><span>Impuls</span></div>
-            <div class="nav-item" onclick="switchScreen('feed', 'Entdecken', this)"><span>📱</span><span>Feed</span></div>
-            <div class="nav-item" onclick="switchScreen('bibel', 'Die Bibel', this)"><span>📖</span><span>Bibel</span></div>
-            <div class="nav-item" onclick="switchScreen('community', 'Community', this)"><span>❤️</span><span>Community</span></div>
-           <div class="nav-item" onclick="switchScreen('profil', 'Mein Profil', this)"><span>👤</span><span>Profil</span></div>
-        </div>
-    </div>
-
-    <script src="impuls.js"></script>
-    <script src="feed.js"></script>
-    <script src="bibel.js"></script>
-    <script src="profil.js"></script>
-    
-    <script>
-        function switchScreen(screenId, title, navElement) {
-    // Schützt vor Fehlern von fremden Browser-Erweiterungen
-    try {
-        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-        
-        let targetScreen = document.getElementById('screen-' + screenId);
-        if (targetScreen) {
-            targetScreen.classList.add('active');
-        }
-        
-        document.getElementById('app-bar-title').innerText = title;
-        
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        if (navElement) {
-            navElement.classList.add('active');
-        }
-
-        let contentArea = document.getElementById('main-content-area');
-        if (contentArea) {
-            contentArea.style.padding = (screenId === 'feed') ? '0' : '20px';
-        }
-        
-        let backBtn = document.getElementById('bible-back-btn');
-        if (backBtn) {
-            backBtn.style.display = "none";
-        }
-        
-        // Profil live rendern, wenn der Tab aktiv wird
-        if (screenId === 'profil' && typeof renderProfil === "function") {
-            renderProfil();
-        }
-
-        if (screenId === 'bibel' && typeof resetBibleView === "function") { 
-            resetBibleView(); 
-        }
-    } catch (fehler) {
-        console.log("Ein externer Fehler wurde abgefangen: ", fehler);
-    }
-}
-    </script>
-</body>
-</html>
+            <input type="text" id="modal-feed-title" placeholder="z.B. Johannes 3,16" style="width: 100%; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #673
