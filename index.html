@@ -146,26 +146,43 @@
     <script src="profil.js"></script>
     
     <script>
-function switchScreen(screenId, title, navElement) {
-    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-    document.getElementById('screen-' + screenId).classList.add('active');
-    document.getElementById('app-bar-title').innerText = title;
-    
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    navElement.classList.add('active');
+        function switchScreen(screenId, title, navElement) {
+    // Schützt vor Fehlern von fremden Browser-Erweiterungen
+    try {
+        document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+        
+        let targetScreen = document.getElementById('screen-' + screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+        }
+        
+        document.getElementById('app-bar-title').innerText = title;
+        
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if (navElement) {
+            navElement.classList.add('active');
+        }
 
-    let contentArea = document.getElementById('main-content-area');
-    contentArea.style.padding = (screenId === 'feed') ? '0' : '20px';
-    
-    document.getElementById('bible-back-btn').style.display = "none";
-    
-    // NEU: Wenn der Profil-Tab angeklickt wird, rufen wir die Render-Funktion auf
-    if (screenId === 'profil' && typeof renderProfil === "function") {
-        renderProfil();
-    }
+        let contentArea = document.getElementById('main-content-area');
+        if (contentArea) {
+            contentArea.style.padding = (screenId === 'feed') ? '0' : '20px';
+        }
+        
+        let backBtn = document.getElementById('bible-back-btn');
+        if (backBtn) {
+            backBtn.style.display = "none";
+        }
+        
+        // Profil live rendern, wenn der Tab aktiv wird
+        if (screenId === 'profil' && typeof renderProfil === "function") {
+            renderProfil();
+        }
 
-    if(screenId === 'bibel' && typeof resetBibleView === "function") { 
-        resetBibleView(); 
+        if (screenId === 'bibel' && typeof resetBibleView === "function") { 
+            resetBibleView(); 
+        }
+    } catch (fehler) {
+        console.log("Ein externer Fehler wurde abgefangen: ", fehler);
     }
 }
     </script>
