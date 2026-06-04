@@ -33,7 +33,7 @@ feedInhalte.forEach((item, index) => {
             <div class="feed-item ${item.bgClass}">
                 <p class="feed-verse">„${item.text}“</p>
                 <p class="feed-author">${item.author}</p>
-                ${index === 0 ? '<div class="scroll-hint">Wische nach oben für mehr ➔</div>' : ''}
+                ${index === 0 ? '<div class="scroll-hint"></div>' : ''}
             </div>`;
     } else if(item.type === "quiz") {
         let optionsHtml = item.options.map(opt => 
