@@ -60,3 +60,10 @@ function resetApp() {
         location.reload();
     }
 }
+
+// Dieser Block sorgt dafür, dass das Profil zur Sicherheit 
+// auch direkt beim Laden der App einmal aufgebaut wird!
+document.addEventListener('DOMContentLoaded', () => {
+    // Kurze Verzögerung, damit die index.html auf jeden Fall bereit ist
+    setTimeout(renderProfil, 100); 
+});
