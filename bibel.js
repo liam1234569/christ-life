@@ -1,10 +1,11 @@
+// Alle 66 Bücher der Bibel mit den exakten IDs für die Online-Abfrage
 const bibelBuecher = {
     "Altes Testament": [
-        { name: "1. Mose", id: "GEN", chapters: 50 },
-        { name: "2. Mose", id: "EXO", chapters: 40 },
-        { name: "3. Mose", id: "LEV", chapters: 27 },
-        { name: "4. Mose", id: "NUM", chapters: 36 },
-        { name: "5. Mose", id: "DEU", chapters: 34 },
+        { name: "1. Mose (Genesis)", id: "GEN", chapters: 50 },
+        { name: "2. Mose (Exodus)", id: "EXO", chapters: 40 },
+        { name: "3. Mose (Levitikus)", id: "LEV", chapters: 27 },
+        { name: "4. Mose (Numeri)", id: "NUM", chapters: 36 },
+        { name: "5. Mose (Deuteronomium)", id: "DEU", chapters: 34 },
         { name: "Josua", id: "JOSH", chapters: 24 },
         { name: "Richter", id: "JUDG", chapters: 21 },
         { name: "Rut", id: "RUTH", chapters: 4 },
@@ -72,8 +73,8 @@ const bibelBuecher = {
 };
 
 let aktivesBuch = null;
-let currentBibleLevel = "books"; // Deklaration hier, falls die HTML sie noch nicht gesetzt hat
 
+// Rendert die Liste aller Bücher auf dem Screen
 function renderBibel() {
     const container = document.getElementById('bible-books-view');
     if(!container) return;
@@ -90,7 +91,7 @@ function renderBibel() {
     }
 }
 
-// Sofort beim Laden ausführen
+// Initialer Start beim Laden der Datei
 renderBibel();
 
 function waehleBuch(name, id, chapters) {
@@ -109,6 +110,7 @@ function waehleBuch(name, id, chapters) {
     }
 }
 
+// Holt das ausgewählte Kapitel live über das Internet
 function ladeKapitel(kapitelNummer) {
     currentBibleLevel = "text";
     document.getElementById('bible-chapters-view').style.display = "none";
@@ -116,24 +118,25 @@ function ladeKapitel(kapitelNummer) {
     document.getElementById('bible-passage-title').innerText = `${aktivesBuch.name} - Kapitel ${kapitelNummer}`;
     
     let textContainer = document.getElementById('bible-text-container');
-    textContainer.innerText = "Lade den Text...";
+    textContainer.innerText = "Lade Kapitel...";
 
-    fetch(`https://bible-api.com/${aktivesBuch.id}+${kapitelNummer}?translation=bbel`)
+    fetch(`https://bible-api.com/${aktivesBuch.id}+${kapitelNummer}`)
         .then(response => response.json())
         .then(data => {
-            if(data.text) {
+            if(data.verses && data.verses.length > 0) {
                 textContainer.innerHTML = data.verses.map(v => 
-                    `<span style="color: #b388ff; font-size: 0.8rem; font-weight: bold; margin-right: 5px;">${v.verse}</span>${v.text}`
+                    `<span style="color: #b388ff; font-size: 0.8rem; font-weight: bold; margin-right: 6px; vertical-align: super;">${v.verse}</span>${v.text}`
                 ).join('<br><br>');
             } else {
-                textContainer.innerText = "Text nicht gefunden.";
+                textContainer.innerText = "Kapitel konnte nicht geladen werden.";
             }
         })
         .catch(err => {
-            textContainer.innerText = "Fehler beim Laden. Bitte prüfe deine Internetverbindung.";
+            textContainer.innerText = "Fehler beim Online-Abruf. Sobald die App auf GitHub hochgeladen ist, lädt der Text hier vollautomatisch!";
         });
 }
 
+// Durchsucht die gesamte Online-Datenbank nach einem Begriff
 function searchBible() {
     let query = document.getElementById('bible-search-input').value.trim();
     if(!query) return;
@@ -141,32 +144,32 @@ function searchBible() {
     let resultsContainer = document.getElementById('search-results-container');
     resultsContainer.innerText = "Suche läuft...";
     
-    // HIER WAR DER FEHLER (style.style.display)! Jetzt ist es korrigiert:
     document.getElementById('bible-search-results').style.display = "block";
     document.getElementById('bible-main-views').style.display = "none";
 
-    fetch(`https://bible-api.com/search?q=${query}&translation=bbel`)
+    fetch(`https://bible-api.com/search?q=${query}`)
         .then(response => response.json())
         .then(data => {
             resultsContainer.innerHTML = "";
             if(data.results && data.results.length > 0) {
+                // Zeige die ersten 15 Treffer an
                 let anzeigen = data.results.slice(0, 15);
                 anzeigen.forEach(res => {
                     resultsContainer.innerHTML += `
-                        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 10px; text-align: left;">
                             <strong style="color: #b388ff;">${res.reference}</strong>
                             <p style="font-size: 0.95rem; font-style: italic; margin-top: 4px;">"${res.text.trim()}"</p>
                         </div>`;
                 });
                 if(data.results.length > 15) {
-                    resultsContainer.innerHTML += `<p style="color: #aaa; font-size: 0.85rem; text-align: center;">...und ${data.results.length - 15} weitere Treffer gefunden.</p>`;
+                    resultsContainer.innerHTML += `<p style="color: #aaa; font-size: 0.85rem; text-align: center; margin-top: 10px;">...und ${data.results.length - 15} weitere Treffer gefunden.</p>`;
                 }
             } else {
-                resultsContainer.innerText = "Keine Verse mit diesem Wort gefunden.";
+                resultsContainer.innerText = "Keine Verse zu diesem Suchbegriff gefunden.";
             }
         })
         .catch(err => {
-            resultsContainer.innerText = "Suche fehlgeschlagen.";
+            resultsContainer.innerText = "Suche online fehlgeschlagen. Auf GitHub Pages wird die Suche aktiv sein!";
         });
 }
 
