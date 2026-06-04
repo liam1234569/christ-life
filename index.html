@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christ Life</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .phone-container {
+            width: 100%; max-width: 410px; height: 840px; background-color: #1a1a1a;
+            border: 8px solid #2a2a2a; border-radius: 36px; display: flex; flex-direction: column;
+            overflow: hidden; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        
+        .app-bar { background-color: #261c38; padding: 20px; text-align: center; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #33254c; position: relative; z-index: 5; }
+        .back-btn { position: absolute; left: 15px; top: 20px; background: none; border: none; color: #b388ff; font-size: 1.1rem; cursor: pointer; display: none; }
+        .app-content { flex: 1; padding: 20px; overflow-y: auto; padding-bottom: 80px; }
+        
+        .screen { display: none; height: 100%; }
+        .screen.active { display: block; }
+
+        .card { background-color: rgba(103, 58, 183, 0.15); border: 1px solid rgba(103, 58, 183, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 15px; text-align: center; }
+        .card-title { color: #b388ff; font-weight: bold; margin-top: 10px; display: block; }
+        .btn { background-color: #673ab7; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+
+        #screen-feed { padding: 0; overflow-y: scroll; scroll-snap-type: y mandatory; height: calc(100% + 20px); margin-top: -20px; }
+        .feed-item { height: 695px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; position: relative; box-shadow: inset 0 0 100px rgba(0,0,0,0.8); }
+        
+        .bg-gradient-1 { background: linear-gradient(135deg, #311b92, #1a237e); }
+        .bg-gradient-2 { background: linear-gradient(135deg, #4a148c, #311b92); }
+        .bg-gradient-3 { background: linear-gradient(135deg, #006064, #004d40); }
+        
+        .feed-verse { font-size: 1.4rem; font-style: italic; line-height: 1.6; margin-bottom: 20px; }
+        .feed-author { color: #b388ff; font-weight: bold; }
+        .quiz-option { background-color: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); color: white; padding: 15px; border-radius: 12px; width: 100%; margin-top: 12px; cursor: pointer; font-size: 1rem; }
+
+        .bible-section-title { font-size: 1.1rem; color: #b388ff; margin: 20px 0 10px 0; font-weight: bold; border-bottom: 1px solid #33254c; padding-bottom: 5px; }
+        .list-item { background-color: #222; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .chapter-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
+        .chapter-box { background-color: #261c38; border: 1px solid #673ab7; color: white; padding: 12px; border-radius: 8px; cursor: pointer; text-align: center; }
+        .bible-text { font-size: 1.1rem; line-height: 1.6; white-space: pre-line; text-align: left; }
+
+        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 65px; background-color: #1a1a1a; border-top: 1px solid #2a2a2a; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
+        .nav-item { color: #888; cursor: pointer; font-size: 0.85rem; display: flex; flex-direction: column; align-items: center; }
+        .nav-item.active { color: #b388ff; font-weight: bold; }
+        .fab { position: absolute; right: 20px; bottom: 85px; width: 56px; height: 56px; background-color: #b388ff; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="app-bar">
+            <button class="back-btn" id="bible-back-btn" onclick="goBackInBible()">◀</button>
+            <span id="app-bar-title">Dein Tagesimpuls</span>
+        </div>
+
+        <div class="app-content" id="main-content-area">
+            
+            <div id="screen-impuls" class="screen active">
+                <div class="card" id="impuls-card-content">Lade Impuls...</div>
+                <button class="btn" onclick="alert('Schön, dass du dir heute Zeit für Gott nimmst!')">Heute darüber nachdenken</button>
+            </div>
+
+            <div id="screen-feed" class="screen"></div>
+
+            <div id="screen-bibel" class="screen">
+                <div style="margin-bottom: 15px; display: flex; gap: 8px;">
+                    <input type="text" id="bible-search-input" placeholder="Wort suchen (z.B. Liebe)..." style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #673ab7; background: #222; color: white;">
+                    <button class="btn" style="width: auto; margin-top: 0; padding: 10px 15px;" onclick="searchBible()">🔍</button>
+                </div>
+
+                <div id="bible-search-results" style="display: none; margin-bottom: 20px;">
+                    <h3 style="color: #b388ff; margin-bottom: 10px;">Suchergebnisse:</h3>
+                    <div id="search-results-container"></div>
+                    <button class="btn" style="background-color: #333;" onclick="clearSearch()">Suche schließen</button>
+                    <hr style="border-color: #33254c; margin-top: 15px; margin-bottom: 15px;">
+                </div>
+
+                <div id="bible-main-views">
+                    <div id="bible-books-view"></div>
+                    <div id="bible-chapters-view" style="display: none;">
+                        <h3 id="selected-book-title">Buch</h3>
+                        <div class="chapter-grid" id="chapter-grid-container"></div>
+                    </div>
+                    <div id="bible-text-view" style="display: none;">
+                        <h3 id="bible-passage-title" style="color: #b388ff; margin-bottom: 15px;">Kapitel</h3>
+                        <div class="bible-text" id="bible-text-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen-community" class="screen">
+                <h3 style="margin-bottom: 15px;">Gebetswand</h3>
+                <div id="prayer-wall-container">
+                    <div class="list-item">
+                        <div>
+                            <div class="list-item-title">„Bitte betet für meine Oma, sie ist im Krankenhaus.“</div>
+                            <div class="list-item-sub">Vor 2 Stunden • Anonym</div>
+                        </div>
+                        <button style="background: none; border: none; color: #ff9800; font-size: 1.2rem;" onclick="prayCounter(this)">🔥 1</button>
+                    </div>
+                </div>
+                <div class="fab" onclick="addPrayer()">+</div>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="switchScreen('impuls', 'Dein Tagesimpuls', this)"><span>⚡</span><span>Impuls</span></div>
+            <div class="nav-item" onclick="switchScreen('feed', 'Entdecken', this)"><span>📱</span><span>Feed</span></div>
+            <div class="nav-item" onclick="switchScreen('bibel', 'Die Bibel', this)"><span>📖</span><span>Bibel</span></div>
+            <div class="nav-item" onclick="switchScreen('community', 'Community', this)"><span>❤️</span><span>Community</span></div>
+        </div>
+    </div>
+
+    <script src="impuls.js"></script>
+    <script src="feed.js"></script>
+    <script src="bibel.js"></script>
+    
+    <script>
+        function switchScreen(screenId, title, navElement) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById('screen-' + screenId).classList.add('active');
+            document.getElementById('app-bar-title').innerText = title;
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            navElement.classList.add('active');
+
+            let contentArea = document.getElementById('main-content-area');
+            contentArea.style.padding = (screenId === 'feed') ? '0' : '20px';
+            
+            document.getElementById('bible-back-btn').style.display = "none";
+            if(screenId === 'bibel' && typeof resetBibleView === "function") { 
+                resetBibleView(); 
+            }
+        }
+
+        function prayCounter(button) {
+            let count = parseInt(button.innerText.replace('🔥 ', ''));
+            button.innerText = '🔥 ' + (count + 1);
+        }
+
+        function addPrayer() {
+            let text = prompt("Dein Gebetsanliegen:");
+            if(text && text.trim() !== "") {
+                let container = document.getElementById('prayer-wall-container');
+                let newCard = document.createElement('div');
+                newCard.className = 'list-item';
+                newCard.innerHTML = `<div><div class="list-item-title">„${text}“</div><div class="list-item-sub">Gerade eben • Du</div></div><button style="background: none; border: none; color: #ff9800; font-size: 1.2rem;" onclick="prayCounter(this)">🔥 0</button>`;
+                container.insertBefore(newCard, container.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>
